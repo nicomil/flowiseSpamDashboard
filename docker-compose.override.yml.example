@@ -1,0 +1,25 @@
+# File di esempio per override configurazione locale
+# Copia questo file come docker-compose.override.yml per personalizzazioni locali
+# Il file docker-compose.override.yml viene automaticamente caricato da docker-compose
+
+version: '3.8'
+
+services:
+  backend:
+    # Mount volume per sviluppo (hot reload)
+    volumes:
+      - ./backend:/app/backend
+    environment:
+      - ENVIRONMENT=development
+    # Porta esposta per debug
+    ports:
+      - "8000:8000"
+
+  frontend:
+    # Mount volume per sviluppo
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+

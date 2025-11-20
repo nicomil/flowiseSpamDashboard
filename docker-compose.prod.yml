@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: spam-dashboard-api
+    restart: unless-stopped
+    # Non esporre porta direttamente, solo tramite Nginx
+    expose:
+      - "8000"
+    environment:
+      - ENVIRONMENT=production
+      - API_PORT=8000
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
+    networks:
+      - spam-dashboard-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: spam-dashboard-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    volumes:
+      # Per SSL certificates (se usi Let's Encrypt)
+      - ./ssl:/etc/nginx/ssl:ro
+    networks:
+      - spam-dashboard-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  spam-dashboard-network:
+    driver: bridge
+
