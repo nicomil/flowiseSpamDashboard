@@ -13,9 +13,6 @@ services:
       - ENVIRONMENT=production
       - API_PORT=8000
       - FRONTEND_URL=http://localhost
-    volumes:
-      # Mount opzionale per sviluppo (commenta in produzione)
-      # - ./backend:/app/backend
     networks:
       - spam-dashboard-network
     healthcheck:
